@@ -1,0 +1,18 @@
+#!/bin/sh
+
+track='/var/log/rock/installed'
+[ ! -d "$track" ] && mkdir -pv "$track"
+
+install() {
+    path_pkg="$1"
+    npkg=$(basename $path_pkg)
+    npkg=$(echo "$npkg" | sed 's/\.rock//')
+    
+    if tar xvf "$pkg" -C / | sed 's/\.\///g; /^$/d' >> "${track}/${pkg}"; then
+        return 0
+    fi
+
+    return 1
+}
+
+
