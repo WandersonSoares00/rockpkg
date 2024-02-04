@@ -1,0 +1,52 @@
+#!/bin/sh
+
+destdir=/home/wanderson/rockpkg
+. "$destdir"/help
+. "$destdir"/create
+. "$destdir"/install
+
+if [ -z $1 ]; then
+    usage
+fi
+
+for op in "$@"; do
+    case $op in
+        --create|-c|--install|-i)
+            cmd=$op; shift
+    ;;
+        --verbose|-v)
+            verb='v'; shift
+    ;;
+        *.${ext})
+            pkg=$op; shift
+    ;;
+        --help|-h)
+            usage; shift
+    ;;
+    esac
+done 
+
+case $cmd in
+    create|-c)
+        if [ -z $pkg ]; then
+            echo "Missing package name"
+            exit 1
+        fi
+      
+        pkg_check $pkg                     || { echo $err; exit 1; }
+    
+        pkg_create $pkg $verb && echo $out || { echo $out; exit 1; }
+        ;;
+    -i|--install)
+        echo $pkg
+        if [ -e "$pkg" ]; then
+            install $pkg && echo "Package installed successfully" || { echo "Error installing package $pkg"; exit 1; }
+        else
+            echo "Package $pkg does not exist"
+            exit 1
+        fi ;;
+    *)
+        echo Bye
+    ;;
+esac
+
