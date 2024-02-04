@@ -11,7 +11,7 @@ fi
 
 for op in "$@"; do
     case $op in
-        --create|-c|--install|-i)
+        --create|-c|--install|-i|--info|-I)
             cmd=$op; shift
     ;;
         --verbose|-v)
@@ -27,7 +27,7 @@ for op in "$@"; do
 done 
 
 case $cmd in
-    create|-c)
+    --create|-c)
         if [ -z $pkg ]; then
             echo "Missing package name"
             exit 1
@@ -37,13 +37,21 @@ case $cmd in
     
         pkg_create $pkg $verb && echo $out || { echo $out; exit 1; }
         ;;
-    -i|--install)
+    --install|-i)
         echo $pkg
         if [ -e "$pkg" ]; then
             install $pkg && echo "Package installed successfully" || { echo "Error installing package $pkg"; exit 1; }
         else
             echo "Package $pkg does not exist"
             exit 1
+        fi ;;
+    --info|-I)
+        . "$destdir"/info
+
+        if [ -z "$pkg" ]; then
+            make_desc
+        else
+            show_desc "$pkg"
         fi ;;
     *)
         echo Bye

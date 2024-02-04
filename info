@@ -1,0 +1,43 @@
+#!/bin/sh
+
+Dir=desc
+File=rockdesc
+
+make_desc() {
+    if [ ! -d "$Dir" ]; then
+        mkdir -v $Dir 
+    fi        
+
+    cat <<EOF > "./${Dir}/${File}"
+MAINTAINER=''
+PACKAGE=''
+DESCRIPTION=''
+LICENSE=''
+VERSION=''
+URL=''
+EOF
+
+}
+
+show_desc() {
+    pakg="$1"
+    dirtmp=$(mktemp -d)
+
+    if tar -tf "${pakg}" "./${Dir}/${File}" >/dev/null 2>/dev/null; then
+        if tar -xf "${pakg}" -C "${dirtmp}" "./${Dir}/${File}"; then
+            . "${dirtmp}/${Dir}/${File}"
+            echo "Mainteiner : $MAINTAINER"
+            echo "Package    : $PACKAGE"
+            echo "Description: $DESCRIPTION"
+            echo "License    : $LICENSE"
+            echo "Version    : $VERSION"
+            echo "Url        : $VERSION"
+        fi            
+    else
+        echo 'Empty description' 
+    fi
+
+    [ -e "$dirtmp" ] && { rm -r "$dirtmp"; }
+}
+
+
