@@ -1,0 +1,79 @@
+#!/bin/sh
+
+export ext='rock'
+export LC_ALL='C'
+export LANG='C'
+
+pkg_check() {
+    name="$1"
+
+    if ! echo $name | grep -q "\b${ext}\b$"; then
+        err="The extension must be ${ext}"
+        return 1
+    fi
+
+    if echo $name | grep -qE "\s+"; then
+        err='The package name must not have spaces'
+        return 1
+    fi
+
+    if ! echo $name | grep -qE "^[a-zA-Z0-9-]+-[0-9]+(\.[0-9]+)*-[0-9]+(\.[0-9]+)*\.${ext}$"; then
+        err="The format expected is: Name-Version-Build.${ext}"
+        return 1;
+    fi
+
+    return 0
+}
+
+pkg_create() {
+    name=$1
+    
+    if tar cf$2 ../${name} .; then
+        out="Package created in ../${name}"
+        return 0
+    fi        
+    out="Error while creating package"
+    return 1
+}
+
+#parse_opts() {
+#    if [ -z $1 ]; then
+#        usage
+#    fi
+#
+#    for op in "$@"; do
+#        case $op in
+#            --create|-c)
+#                cmd=$op; shift
+#        ;;
+#            --verbose|-v)
+#                verb='v'; shift
+#        ;;
+#            *.${ext})
+#                pkg=$op; shift
+#        ;;
+#            *)
+#                usage; shift
+#        ;;
+#        esac
+#    done 
+#}
+
+#parse_opts $@
+
+#case $cmd in
+#    create|-c)
+#        if [ -z $pkg ]; then
+#            echo "Missing package name"
+#            exit 1
+#        fi
+#      
+#        pkg_check $pkg                     || { echo $err; exit 1; }
+#
+#        pkg_create $pkg $verb && echo $out || { echo $out; exit 1; }
+#        ;;
+#    *)
+#        echo Bye
+#    ;;
+#esac
+
