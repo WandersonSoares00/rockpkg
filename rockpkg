@@ -1,5 +1,9 @@
 #!/bin/sh
 
+export ext='rock'
+export LC_ALL='C'
+export LANG='C'
+
 destdir=/home/wanderson/rockpkg
 . "$destdir"/help
 . "$destdir"/create
@@ -9,42 +13,50 @@ if [ -z $1 ]; then
     usage
 fi
 
-for op in "$@"; do
+get_opt() {
+    op="$1"
     case $op in
-        --create|-c|--install|-i|--info|-I)
-            cmd=$op; shift
+        --create|-c|--info|-I)
+            cmd="$op"; shift
     ;;
+        --install|-i)
+            cmd="i"; shift
+    ;;            
         --verbose|-v)
             verb='v'; shift
-    ;;
+    ;; 
         *.${ext})
-            pkg=$op; shift
+            pkg="$op"; shift
     ;;
         --help|-h)
             usage; shift
     ;;
-    esac
-done 
+    esac                                       
+}    
+ 
+for param in "$@"; do
+    get_opt "$param"
+ 
+    if [ "$cmd" = "i" ] && [ -n "$pkg" ]; then
+        install "$pkg" && echo "Package installed successfully" || { echo "Error installing package $pkg"; exit 1; }
+        unset pkg
+    fi
+done
 
-case $cmd in
+case "$cmd" in
+    --install|-i)
+        exit
+        ;;
     --create|-c)
-        if [ -z $pkg ]; then
+        if [ -z "$pkg" ]; then
             echo "Missing package name"
             exit 1
         fi
       
-        pkg_check $pkg                     || { echo $err; exit 1; }
+        pkg_check "$pkg"                     || { echo $err; exit 1; }
     
-        pkg_create $pkg $verb && echo $out || { echo $out; exit 1; }
+        pkg_create "$pkg" $verb && echo $out || { echo $out; exit 1; }
         ;;
-    --install|-i)
-        echo $pkg
-        if [ -e "$pkg" ]; then
-            install $pkg && echo "Package installed successfully" || { echo "Error installing package $pkg"; exit 1; }
-        else
-            echo "Package $pkg does not exist"
-            exit 1
-        fi ;;
     --info|-I)
         . "$destdir"/info
 
