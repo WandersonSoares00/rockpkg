@@ -1,14 +1,14 @@
 #!/bin/sh
 
-Dir=desc
-File=rockdesc
+Dir=var/log/rock/desc
 
 make_desc() {
     if [ ! -d "$Dir" ]; then
-        mkdir -v $Dir 
+        mkdir -pv $Dir 
     fi        
-
-    cat <<EOF > "./${Dir}/${File}"
+    
+    File=$(basename $PWD)
+    cat <<EOF > "${Dir}/${File}"
 MAINTAINER=''
 PACKAGE=''
 DESCRIPTION=''
@@ -21,6 +21,7 @@ EOF
 
 show_desc() {
     pakg="$1"
+    File=$(echo "$pakg" | sed 's/-.*//')
     dirtmp=$(mktemp -d)
 
     if tar -tf "${pakg}" "./${Dir}/${File}" >/dev/null 2>/dev/null; then
@@ -31,7 +32,7 @@ show_desc() {
             echo "Description: $DESCRIPTION"
             echo "License    : $LICENSE"
             echo "Version    : $VERSION"
-            echo "Url        : $VERSION"
+            echo "Url        : $URL"
         fi            
     else
         echo 'Empty description' 
