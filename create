@@ -16,6 +16,13 @@ pkg_check() {
         err='The package name must not have spaces'
         return 1
     fi
+    
+    name_exp=$(basename $PWD)
+
+    if ! echo $name | grep -qE "^${name_exp}-"; then
+        err="The name of package must be $name_exp"
+        return 1
+    fi
 
     if ! echo $name | grep -qE "^[a-zA-Z0-9-]+-[0-9]+(\.[0-9]+)*-[0-9]+(\.[0-9]+)*\.${ext}$"; then
         err="The format expected is: Name-Version-Build.${ext}"

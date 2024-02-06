@@ -7,12 +7,14 @@ install() {
     path_pkg="$1"
     npkg=$(basename $path_pkg)
     npkg=$(echo "$npkg" | sed 's/\.rock//')
-    
-    if tar xvf "$pkg" -C / | sed 's/\.\///g; /^$/d' >> "${track}/${pkg}"; then
-        return 0
+ 
+    if ! tar xvf "$pkg" -C / >> "${track}/${pkg}" 2>/dev/null; then
+        return 1
     fi
+    
+    sed -i 's/\.\//\//g; /^$/d; /^\/$/d' "${track}/${pkg}" 2>/dev/null
 
-    return 1
+    return 0
 }
 
 
