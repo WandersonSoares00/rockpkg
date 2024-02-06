@@ -1,0 +1,21 @@
+#!/bin/sh
+
+
+pkg_remove() {
+    npkg="$1"
+
+    while IFS= read file; do
+        rm "$file" 2>/dev/null
+    done < "$npkg"
+
+    while IFS= read l; do
+        unlink "$l" 2>/dev/null
+    done < "$npkg"
+
+    while IFS= read dir; do
+        rm -d "$dir" 2>/dev/null
+    done < "$npkg"
+
+    rm "$npkg"
+}
+

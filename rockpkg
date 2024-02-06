@@ -9,31 +9,30 @@ destdir=/home/wanderson/rockpkg
 . "$destdir"/create
 . "$destdir"/install
 
-if [ -z $1 ]; then
-    usage
-fi
-
 get_opt() {
     op="$1"
     case $op in
-        --create|-c|--info|-I)
-            cmd="$op"; shift
+        --create|-c|--info|-I|--remove|-r|--help|-h)
+            cmd="$op"
     ;;
         --install|-i)
-            cmd="i"; shift
-    ;;            
+            cmd="i"
+    ;;
         --verbose|-v)
-            verb='v'; shift
-    ;; 
+            verb='v'
+    ;;
         *.${ext})
-            pkg="$op"; shift
+            pkg="$op"
     ;;
-        --help|-h)
-            usage; shift
+        *)
+            prog="$op"
     ;;
-    esac                                       
-}    
+    esac
+    shift
+}
  
+[ -z $1 ] && { usage; exit 1; }
+
 for param in "$@"; do
     get_opt "$param"
  
@@ -48,15 +47,12 @@ case "$cmd" in
         exit
         ;;
     --create|-c)
-        if [ -z "$pkg" ]; then
-            echo "Missing package name"
-            exit 1
-        fi
+        [ -z "$pkg" ] && { echo "Missing package name"; exit 1; }
       
         pkg_check "$pkg"                     || { echo $err; exit 1; }
     
         pkg_create "$pkg" $verb && echo $out || { echo $out; exit 1; }
-        ;;
+        exit 0 ;;
     --info|-I)
         . "$destdir"/info
 
@@ -64,9 +60,28 @@ case "$cmd" in
             make_desc
         else
             show_desc "$pkg"
-        fi ;;
-    *)
-        echo Bye
-    ;;
+        fi
+        exit 0 ;;
+    --remove|-r)
+        [ -z "$prog" ] && { echo "Missing program"; exit 1; }
+        
+        . "$destdir"/remove
+        cd $track
+        found=false
+        for f in *; do
+            if echo "$f" | grep -wq "$prog"; then
+                pkg_remove "$f"; found=true; break
+            fi
+        done
+        if [ "$found" = false ]; then
+            echo "Unable to locate program $prog"; exit 1;
+        else            
+            echo "package removed successfully"
+        fi
+
+        exit 0 ;;
+    --help|-h)
+        help
+        exit 0 ;;
 esac
 
