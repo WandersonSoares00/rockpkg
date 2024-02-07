@@ -1,0 +1,21 @@
+#!/bin/sh
+
+usage() {
+    cat <<EOF
+Usage: rockpkg [OPTIONS] [ARCHIVE]
+
+Low level package manager
+    -h, --help
+          Show options
+    -c, --create
+          Create a package
+    -i, --install
+          Install one or more packages
+    -r, --remove
+          Remove an installed package
+    -v, --verbose
+          Look more information
+    -l, --list
+          List all programs installed by rockpkg
+EOF
+}
