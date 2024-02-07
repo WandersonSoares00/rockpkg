@@ -1,9 +1,5 @@
 #!/bin/sh
 
-export ext='rock'
-export LC_ALL='C'
-export LANG='C'
-
 pkg_check() {
     name="$1"
 
@@ -42,45 +38,4 @@ pkg_create() {
     out="Error while creating package"
     return 1
 }
-
-#parse_opts() {
-#    if [ -z $1 ]; then
-#        usage
-#    fi
-#
-#    for op in "$@"; do
-#        case $op in
-#            --create|-c)
-#                cmd=$op; shift
-#        ;;
-#            --verbose|-v)
-#                verb='v'; shift
-#        ;;
-#            *.${ext})
-#                pkg=$op; shift
-#        ;;
-#            *)
-#                usage; shift
-#        ;;
-#        esac
-#    done 
-#}
-
-#parse_opts $@
-
-#case $cmd in
-#    create|-c)
-#        if [ -z $pkg ]; then
-#            echo "Missing package name"
-#            exit 1
-#        fi
-#      
-#        pkg_check $pkg                     || { echo $err; exit 1; }
-#
-#        pkg_create $pkg $verb && echo $out || { echo $out; exit 1; }
-#        ;;
-#    *)
-#        echo Bye
-#    ;;
-#esac
 
