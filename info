@@ -1,6 +1,6 @@
 #!/bin/sh
 
-Dir=var/log/rock/desc
+Dir="$config/desc"
 
 make_desc() {
     if [ ! -d "$Dir" ]; then
@@ -41,4 +41,12 @@ show_desc() {
     [ -e "$dirtmp" ] && { rm -r "$dirtmp"; }
 }
 
+show_progs() {
+    cd "$config/installed"
+
+    for prog in *; do
+        progname="${prog%.$ext}"
+        echo "$progname"
+    done         
+}
 
