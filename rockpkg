@@ -3,16 +3,18 @@
 export ext='rock'
 export LC_ALL='C'
 export LANG='C'
+export config=/var/log/rock
 
 destdir=/home/wanderson/rockpkg
 . "$destdir"/help
 . "$destdir"/create
 . "$destdir"/install
+. "$destdir"/info
 
 get_opt() {
     op="$1"
     case $op in
-        --create|-c|--info|-I|--remove|-r|--help|-h)
+        --create|-c|--info|-I|--remove|-r|--help|-h|--list|-l)
             cmd="$op"
     ;;
         --install|-i)
@@ -34,16 +36,23 @@ get_opt() {
 [ -z $1 ] && { usage; exit 1; }
 
 for param in "$@"; do
+    if echo "$param" | grep -Eq "^-d="; then
+        dest="${param#-d=}"
+        dest="${dest%/}"
+    fi
+done
+
+for param in "$@"; do
     get_opt "$param"
  
     if [ "$cmd" = "i" ] && [ -n "$pkg" ]; then
-        install "$pkg" && echo "Package installed successfully" || { echo "Error installing package $pkg"; exit 1; }
+        install "$pkg" "$dest" && echo "Package installed successfully" || { echo "Error installing package $pkg"; exit 1; }
         unset pkg
     fi
 done
 
 case "$cmd" in
-    --install|-i)
+    --intall|-i|i)
         exit
         ;;
     --create|-c)
@@ -54,7 +63,6 @@ case "$cmd" in
         pkg_create "$pkg" $verb && echo $out || { echo $out; exit 1; }
         exit 0 ;;
     --info|-I)
-        . "$destdir"/info
 
         if [ -z "$pkg" ]; then
             make_desc
@@ -80,8 +88,14 @@ case "$cmd" in
         fi
 
         exit 0 ;;
-    --help|-h)
-        help
+    --list|-l)
+        show_progs
         exit 0 ;;
+    --help|-h)
+        usage
+        exit 0 ;;
+    *)
+        usage
+        exit 1 ;;
 esac
 
