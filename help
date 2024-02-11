@@ -11,6 +11,9 @@ Low level package manager
           Create a package
     -i, --install
           Install one or more packages
+    -I, --info
+          Make a directory with package information if no archive is provided.
+          if so, show information about this package.
     -r, --remove
           Remove an installed package
     -v, --verbose
