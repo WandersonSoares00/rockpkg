@@ -3,9 +3,9 @@
 export ext='rock'
 export LC_ALL='C'
 export LANG='C'
-export config=/var/log/rock
+export config=/var/lib/rockpkg
 
-destdir=/home/wanderson/rockpkg
+destdir=/usr/lib/rockpkg
 . "$destdir"/help
 . "$destdir"/create
 . "$destdir"/install
@@ -46,7 +46,7 @@ for param in "$@"; do
     get_opt "$param"
  
     if [ "$cmd" = "i" ] && [ -n "$pkg" ]; then
-        install "$pkg" "$dest" && echo "Package installed successfully" || { echo "Error installing package $pkg"; exit 1; }
+        install "$pkg" "$dest" && echo "Package installed successfully" || { echo "Error installing package $pkg" >&2; exit 1; }
         unset pkg
     fi
 done
@@ -56,11 +56,11 @@ case "$cmd" in
         exit
         ;;
     --create|-c)
-        [ -z "$pkg" ] && { echo "Missing package name"; exit 1; }
+        [ -z "$pkg" ] && { echo "Missing package name" >&2; exit 1; }
       
-        pkg_check "$pkg"                     || { echo $err; exit 1; }
+        pkg_check "$pkg"                     || { echo $err >&2; exit 1; }
     
-        pkg_create "$pkg" $verb && echo $out || { echo $out; exit 1; }
+        pkg_create "$pkg" $verb && echo $out || { echo $out >&2; exit 1; }
         exit 0 ;;
     --info|-I)
 
@@ -71,7 +71,7 @@ case "$cmd" in
         fi
         exit 0 ;;
     --remove|-r)
-        [ -z "$prog" ] && { echo "Missing program"; exit 1; }
+        [ -z "$prog" ] && { echo "Missing program" >&2; exit 1; }
         
         . "$destdir"/remove
         cd $track
@@ -82,7 +82,7 @@ case "$cmd" in
             fi
         done
         if [ "$found" = false ]; then
-            echo "Unable to locate program $prog"; exit 1;
+            echo "Unable to locate program $prog" >&2; exit 1;
         else            
             echo "package removed successfully"
         fi

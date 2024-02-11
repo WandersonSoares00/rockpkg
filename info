@@ -4,13 +4,14 @@ Dir="$config/desc"
 
 make_desc() {
     if [ ! -d "$Dir" ]; then
-        mkdir -pv $Dir 
+        mkdir -pv "./$Dir"
     fi        
     
     File=$(basename $PWD)
-    cat <<EOF > "${Dir}/${File}"
+    cat <<EOF > "./${Dir}/${File}"
 MAINTAINER=''
 PACKAGE=''
+ARCHITECTURE=''
 DESCRIPTION=''
 LICENSE=''
 VERSION=''
@@ -22,17 +23,19 @@ EOF
 show_desc() {
     pakg="$1"
     File=$(echo "$pakg" | sed 's/-.*//')
+    File=$(basename $File)
     dirtmp=$(mktemp -d)
 
-    if tar -tf "${pakg}" "./${Dir}/${File}" >/dev/null 2>/dev/null; then
-        if tar -xf "${pakg}" -C "${dirtmp}" "./${Dir}/${File}"; then
-            . "${dirtmp}/${Dir}/${File}"
-            echo "Mainteiner : $MAINTAINER"
-            echo "Package    : $PACKAGE"
-            echo "Description: $DESCRIPTION"
-            echo "License    : $LICENSE"
-            echo "Version    : $VERSION"
-            echo "Url        : $URL"
+    if tar -tf "${pakg}" ".${Dir}/${File}" >/dev/null 2>/dev/null; then
+        if tar -xf "${pakg}" -C "${dirtmp}" ".${Dir}/${File}"; then
+            . "${dirtmp}${Dir}/${File}"
+            echo "Mainteiner  : $MAINTAINER"
+            echo "Package     : $PACKAGE"
+            echo "Architecture: $ARCHITECTURE"
+            echo "Description : $DESCRIPTION"
+            echo "License     : $LICENSE"
+            echo "Version     : $VERSION"
+            echo "Url         : $URL"
         fi            
     else
         echo 'Empty description' 
@@ -42,11 +45,21 @@ show_desc() {
 }
 
 show_progs() {
-    cd "$config/installed"
+    if ! cd "$config/installed"; then
+        return 1
+    fi
+    
+    nfiles=$(ls -A . 2>/dev/null | wc -l)
+    
+    if [ "$nfiles" != "0" ]; then
+        for prog in *; do
+            progname="${prog%.$ext}"
+            echo "$progname"
+        done
+    fi
 
-    for prog in *; do
-        progname="${prog%.$ext}"
-        echo "$progname"
-    done         
+    echo "Total: $nfiles"
+
+    return 0
 }
 
